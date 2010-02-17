@@ -84,7 +84,7 @@ echo('<?xml version="1.0" encoding="utf-8"?>');
 <body>
 <h1><?php echo($id); ?></h1>
 
-<?php echo(isset($content) ? $creole->parse($content) : PAGE_NOT_FOUND) ?>
+<?php echo($creole->parse(isset($content) ? $content : PAGE_NOT_FOUND)); ?>
 
 <hr/>
 
