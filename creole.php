@@ -239,7 +239,7 @@ class creole_rule_named_interwiki_link extends creole_rule_named_link {
             preg_match('/(.*?):(.*)/', $matches[1][0], $m);
         }
         
-        if (!$m || !isset($options['interwiki'][$m[1]])) {
+        if (!isset($m[1]) || !isset($options['interwiki'][$m[1]])) {
             return parent::build($node, $matches, $options);
         }
         
