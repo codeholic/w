@@ -553,12 +553,21 @@ $tests = array(
         'input'   => "{{image.png|}}",
         'output'  => '<p><img src="image.png" alt=""/></p>',
     ),
+    array(
+        'name'    => "Extension in block context",
+        'input'   => "Before\n\n<<< \$node->append('Some text'); >>>\n\nAfter",
+        'output'  => "<p>Before\n</p>\nSome text\n<p>\nAfter</p>",
+    ),
 );
 
 plan(count($array));
 
-function palindrome ($link) {
+function palindrome_callback($link) {
     return 'http://www.example.com/wiki/' . strrev($link);
+}
+
+function extension_callback($node, $data) {
+    call_user_func(create_function('$node', $data), $node); // never do it in production!
 }
 
 foreach ($tests as $test) {
@@ -567,8 +576,9 @@ foreach ($tests as $test) {
         'interwiki' => array(
             'MeatBall'   => 'http://www.usemod.com/cgi-bin/mb.pl?%s',
             'WikiCreole' => 'http://www.wikicreole.org/wiki/%s',
-            'Palindrome' => 'palindrome'
-        )
+            'Palindrome' => 'palindrome_callback'
+        ),
+        'extension' => 'extension_callback',
     );
     if (isset($test['options'])) {
         $options = array_merge($options, $test['options']);

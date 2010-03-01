@@ -263,6 +263,21 @@ class creole_rule_unnamed_interwiki_link extends creole_rule_named_interwiki_lin
     }
 }
 
+class creole_rule_extension extends creole_rule {
+    function creole_rule_extension($params = array()) {
+        parent::creole_rule($params);
+    }
+    
+    function build($node, $matches, $options = array()) {
+        if (isset($options['extension']) && is_callable($options['extension'])) {
+            call_user_func($options['extension'], $node, $matches[1][0]);
+        }
+        else {
+            $node->append(htmlspecialchars($matches[0][0]));
+        }
+    }
+}
+
 class creole_node {
     var $tag;
     var $attrs;
@@ -310,6 +325,7 @@ class creole {
     function creole($options = array()) {
         $this->options = $options;
         
+        $rx['ext'] = '<<<([^>]*(?:>>?(?!>)[^>]*)*)>>>';
         $rx['link'] = '[^\]|~\n]*(?:(?:\](?!\])|~.)[^\]|~\n]*)*';
         $rx['link_text'] = '[^\]~\n]*(?:(?:\](?!\])|~.)[^\]~\n]*)*';
         $rx['uri_prefix'] = '\b(?:(?:https?|ftp):\\/\\/|mailto:)';
@@ -452,6 +468,10 @@ class creole {
 
             'raw_uri' => new creole_rule_unnamed_uri(array(
                 'regex' => '/(' . $rx['raw_uri'] . ')/',
+            )),
+            
+            'extension' => new creole_rule_extension(array(
+                'regex' => '/' . $rx['ext'] . '/',
             ))
         );
         
@@ -491,7 +511,7 @@ class creole {
         $g['root'] = new creole_rule(array(
             'children' => array(
                 &$g['h1'], &$g['h2'], &$g['h3'], &$g['h4'], &$g['h5'], &$g['h6'],
-                &$g['hr'], &$g['ul'], &$g['ol'], &$g['pre'], &$g['table']
+                &$g['hr'], &$g['ul'], &$g['ol'], &$g['pre'], &$g['table'], &$g['extension']
             ),
             'fallback' => array('children' => array(&$g['p']))
         ));
