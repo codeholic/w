@@ -539,12 +539,6 @@ $tests = array(
         'output'  => '<table><tr><td> <img src="image.png" alt="Alternative text"/> </td></tr></table>'
     ),
     array(
-        'name'    => "Image in table (strict)",
-        'input'   => "| {{image.png|Alternative text}} |",
-        'output'  => '<table><tr><td> {{image.png</td><td>Alternative text}} </td></tr></table>',
-        'options' => array( 'strict' => true )
-    ),
-    array(
         'name'    => "Image in named link in table",
         'input'   => "| [[Link|{{image.png|Alternative text}}]] |",
         'output'  => '<table><tr><td> <a href="/wiki/Link"><img src="image.png" alt="Alternative text"/></a> </td></tr></table>'
@@ -555,23 +549,10 @@ $tests = array(
         'output'  => '<p><img src="image.png" alt=""/></p>'
     ),
     array(
-        'name'    => "Image without alternative text (strict)",
-        'input'   => "{{image.png}}",
-        'output'  => '<p>{{image.png}}</p>',
-        'options' => array( 'strict' => true )
-    ),
-    array(
         'name'    => "Image with empty alternative text",
         'input'   => "{{image.png|}}",
         'output'  => '<p><img src="image.png" alt=""/></p>',
-        'options' => array( 'strict' => true )
     ),
-    array(
-        'name'    => "Image with custom default alternative text",
-        'input'   => "{{image.png}}",
-        'output'  => '<p><img src="image.png" alt="Image"/></p>',
-        'options' => array( 'default_image_text' => 'Image' )
-    )
 );
 
 plan(count($array));

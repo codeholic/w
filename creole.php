@@ -415,8 +415,7 @@ class creole {
             ),
 
             'img' => new creole_rule_image(array(
-                'regex' => '/\{\{((?!\{)[^|}\n]*(?:}(?!})[^|}\n]*)*)\|' .
-                          '([^}~\n]*((}(?!})|~.)[^}~\n]*)*)}}/'
+                'regex' => '/' . $rx['image'] . '/',
             )),
             
             'escaped_sequence' => array(
