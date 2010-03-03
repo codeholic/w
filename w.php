@@ -68,8 +68,8 @@ $creole = new creole(
     array(
         'link_format' => '/w.php?id=%s',
         'interwiki' => array(
-            'WikiCreole' => 'http://www.wikicreole.org/wiki/',
-            'Wikipedia' => 'http://en.wikipedia.org/wiki/'
+            'WikiCreole' => 'http://www.wikicreole.org/wiki/%s',
+            'Wikipedia' => 'http://en.wikipedia.org/wiki/%s'
         )
     )
 );
