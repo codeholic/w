@@ -95,6 +95,11 @@ $tests = array(
         'output'  => "<pre>Preformatted block\n</pre><p><tt>Block 2</tt></p>"
     ),
     array(
+        'name'    => "Preformatted block markup with trailing spaces",
+        'input'   => "{{{  \t\nPreformatted block\n}}}  \t\n",
+        'output'  => "<pre>Preformatted block\n</pre>"
+    ),
+    array(
         'name'    => "Space escapes nowiki",
         'input'   => "{{{\nPreformatted block\n }}}\n}}}",
         'output'  => "<pre>Preformatted block\n}}}\n</pre>"

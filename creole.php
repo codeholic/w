@@ -349,7 +349,7 @@ class creole {
             
             'pre' => array(
                 'tag' => 'pre',
-                'regex' => '/(^|\n)\{\{\{\n((.*\n)*?)}}}(\n|$)/',
+                'regex' => '/(^|\n)\{\{\{[ \t]*\n((.*\n)*?)}}}[ \t]*(\n|$)/',
                 'capture' => 2,
                 'replace_regex' => '/^ ([ \t]*}}})/m',
                 'replace_string' => '$1'
