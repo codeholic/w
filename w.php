@@ -28,7 +28,7 @@ require_once('./creole.php');
 define(MAIN_PAGE, 'MainPage');
 define(MAIN_PAGE_DEFAULT_CONTENT, 'Welcome to **codeholic**\'s wiki.');
 define(PAGE_NOT_FOUND, 'This page is not started yet.');
-define(URL_FORMAT, 'http://codeholic.110mb.com/w.php?id=%s');
+define(URL_FORMAT, '/w.php?id=%s');
 
 // Strip slashes from GET/POST/COOKIE (if magic_quotes_gpc is enabled)
 if (get_magic_quotes_gpc())
