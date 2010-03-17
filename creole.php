@@ -521,6 +521,7 @@ class creole {
     
     function parse($data, $options = array()) {
         $node = new creole_node();
+        $data = preg_replace('/\r\n?/', "\n", $data);
         $options = array_merge($this->options, $options);
         $this->grammar['root']->apply($node, $data, $options);
         return $node->as_string();
