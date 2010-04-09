@@ -560,8 +560,13 @@ $tests = array(
     ),
     array(
         'name'    => "Extension in block context",
-        'input'   => "Before\n\n<<< \$node->append('Some text'); >>>\n\nAfter",
+        'input'   => "Before\n\n<<<php \$node->append('Some text');>>>\n\nAfter",
         'output'  => "<p>Before\n</p>\nSome text\n<p>\nAfter</p>",
+    ),
+    array(
+        'name'    => 'Embedded HTML',
+        'input'   => "Before\n\n<<<html <code>Hello, world!</code> >>>\n\nAfter",
+        'output'  => "<p>Before\n</p>\n<code>Hello, world!</code> \n<p>\nAfter</p>",
     ),
 );
 
@@ -571,8 +576,17 @@ function palindrome_callback($link) {
     return 'http://www.example.com/wiki/' . strrev($link);
 }
 
+function php_handler($node, $arg) { // never use it in production!
+    eval($arg);
+}
+
+function html_handler($node, $arg) {
+    $node->append($arg);
+}
+
 function extension_callback($node, $data) {
-    call_user_func(create_function('$node', $data), $node); // never do it in production!
+    list($moniker, $arg) = explode(' ', $data, 2);
+    call_user_func($moniker . '_handler', $node, $arg); 
 }
 
 foreach ($tests as $test) {
