@@ -186,7 +186,7 @@ class creole_rule_named_link extends creole_rule {
         if (function_exists($format)) {
             return call_user_func($format, $link);
         }
-        return sprintf($format, $link);
+        return sprintf($format, rawurlencode($link));
     }
 
     function build($node, $matches, $options = array()) {

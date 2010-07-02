@@ -455,12 +455,12 @@ $tests = array(
     array(
         'name'    => "Escaped link ending #1",
         'input'   => "[[Link~]]]",
-        'output'  => "<p><a href=\"/wiki/Link]\">Link<span class=\"escaped\">]</span></a></p>"
+        'output'  => "<p><a href=\"/wiki/Link%5D\">Link<span class=\"escaped\">]</span></a></p>"
     ),
     array(
         'name'    => "Escaped link ending #2",
         'input'   => "[[Link]~]]]",
-        'output'  => "<p><a href=\"/wiki/Link]]\">Link]<span class=\"escaped\">]</span></a></p>"
+        'output'  => "<p><a href=\"/wiki/Link%5D%5D\">Link]<span class=\"escaped\">]</span></a></p>"
     ),
     array(
         'name'    => "Escaped link ending #3",
@@ -475,12 +475,12 @@ $tests = array(
     array(
         'name'    => "Escaped link text separator #1",
         'input'   => "[[Link~|some text]]",
-        'output'  => "<p><a href=\"/wiki/Link|some text\">Link<span class=\"escaped\">|</span>some text</a></p>"
+        'output'  => "<p><a href=\"/wiki/Link%7Csome%20text\">Link<span class=\"escaped\">|</span>some text</a></p>"
     ),
     array(
         'name'    => "Escaped link text separator #2",
         'input'   => "[[Link~||some text]]",
-        'output'  => "<p><a href=\"/wiki/Link|\">some text</a></p>"
+        'output'  => "<p><a href=\"/wiki/Link%7C\">some text</a></p>"
     ),
     array(
         'name'    => "Escaped link text separator #3",
