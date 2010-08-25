@@ -74,7 +74,7 @@ class creole_rule {
     function apply($node, $data, $options = array()) {
         $tail = $data;
         
-        if (!get_class($this->fallback)) {
+        if (!is_object($this->fallback)) {
             $this->fallback = $this->fallback
                 ? new creole_rule($this->fallback)
                 : new creole_rule_default_fallback();
@@ -86,7 +86,7 @@ class creole_rule {
             
             for ($i = 0; $i < count($this->children); $i++) {
                 if (!isset($matches[$i])) {
-                    if (!get_class($this->children[$i])) {
+                    if (!is_object($this->children[$i])) {
                         $this->children[$i] = new creole_rule($this->children[$i]);
                     }
                     $matches[$i] = $this->children[$i]->match($tail);
@@ -110,7 +110,7 @@ class creole_rule {
                 break;
             }
             
-            if (!get_class($rule)) {
+            if (!is_object($rule)) {
                 $rule = new creole_rule($rule);
             }
             $rule->build($node, $best, $options);
@@ -298,7 +298,7 @@ class creole_node {
     function as_string() {
         $result = '';
         foreach ($this->content as $item) {
-            $result .= get_class($item) ? $item->as_string() : $item;
+            $result .= is_object($item) ? $item->as_string() : $item;
         }
         
         if (!empty($this->tag)) {
