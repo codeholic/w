@@ -54,13 +54,23 @@ sqlite_exec($dbh, 'INSERT OR IGNORE INTO w (id, content) VALUES' .
 
 $id = isset($_GET['id']) ? $_GET['id'] : MAIN_PAGE;
 
+session_start();
+
 if (isset($_POST['content'])) {
-    $content = $_POST['content'];
-    sqlite_exec($dbh, 'INSERT OR REPLACE INTO w (id, content) VALUES' .
-                      '(\'' . sqlite_escape_string($id) . '\',\'' .
-                              sqlite_escape_string($content) . '\')');
+    if (isset($_POST['captcha_text']) && isset($_SESSION['captcha_text'])
+        && $_POST['captcha_text'] == $_SESSION['captcha_text'])
+    {
+        $content = $_POST['content'];
+        sqlite_exec($dbh, 'INSERT OR REPLACE INTO w (id, content) VALUES' .
+                          '(\'' . sqlite_escape_string($id) . '\',\'' .
+                                  sqlite_escape_string($content) . '\')');
+    }
+    else {
+        $error = 'The code you entered was incorrect.';
+    }
 }
-else {
+
+if (!isset($content)) {
     $res = sqlite_query($dbh, 'SELECT content FROM w ' .
                               'WHERE id = \'' . sqlite_escape_string($id) . '\'');
     if ($row = sqlite_fetch_array($res)) {
@@ -84,6 +94,9 @@ echo('<?xml version="1.0" encoding="UTF-8"?>');
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head xmlns="http://www.w3.org/1999/xhtml">
 <title><?php echo(htmlspecialchars($id)); ?></title>
+<style type="text/css">
+.error { color: red; }
+</style>
 </head>
 <body>
 <h1><?php echo(htmlspecialchars($id)); ?></h1>
@@ -94,10 +107,21 @@ echo('<?xml version="1.0" encoding="UTF-8"?>');
 
 <p>You can edit this page by submitting the form below.</p>
 
+<?php if (isset($error)) { ?>
+<p class="error"><?php echo($error); ?></p>
+<?php } ?>
+
+
 <form action="<?php echo(format_link($id)); ?>" method="POST">
 <div>
-<textarea name="content" style="width: 100%;" rows="10"><?php if (isset($content)) { echo(htmlspecialchars($content)); } ?></textarea>
+<textarea name="content" style="width: 100%;" rows="10"><?php
+    if (isset($_POST['content'])) { echo(htmlspecialchars($_POST['content'])); }
+    else if (isset($content)) { echo(htmlspecialchars($content)); }
+?></textarea>
 </div>
+
+<div>Please enter the code on the image</div>
+<div><img src="captcha.php"/> <input type="text" name="captcha_text"/></div>
 
 <input type="submit"/>
 </form>
