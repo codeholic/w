@@ -568,6 +568,16 @@ $tests = array(
         'input'   => "Before\n\n<<<html <code>Hello, world!</code> >>>\n\nAfter",
         'output'  => "<p>Before\n</p>\n<code>Hello, world!</code> \n<p>\nAfter</p>",
     ),
+    array(
+        'name'    => 'HTML entity',
+        'input'   => "This is a text &mdash; &#119;ith H&#x54;ML entities",
+        'output'  => '<p>This is a text &mdash; &#119;ith H&#x54;ML entities</p>',
+    ),
+    array(
+        'name'    => 'HTML entity in alternative text',
+        'input'   => "{{image.png|This is hellipsis&hellip;}}",
+        'output'  => '<p><img src="image.png" alt="This is hellipsis&hellip;"/></p>',
+    ),
 );
 
 plan(count($array));

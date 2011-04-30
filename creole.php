@@ -25,6 +25,17 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  */
 
+function mild_htmlspecialchars($string) {
+    $subst = array(
+        '"' => '&quot;',
+        '&' => '&amp;',
+        '<' => '&lt;',
+        '>' => '&gt;',
+    );
+    return preg_replace('/(&(?:\w+|#x[0-9A-Fa-f]+|#\d+);|["&<>])/e',
+        'isset(\$subst["$1"]) ? \$subst["$1"] : "$1"', $string);
+}
+
 class creole_rule {
     var $regex = false;
     var $capture = false;
@@ -134,7 +145,7 @@ class creole_rule {
 
 class creole_rule_default_fallback extends creole_rule {
     function apply($node, $data, $options = array()) {
-        $node->append(htmlspecialchars($data));
+        $node->append(mild_htmlspecialchars($data));
     }
 }
 
@@ -273,7 +284,7 @@ class creole_rule_extension extends creole_rule {
             call_user_func($options['extension'], $node, $matches[1][0]);
         }
         else {
-            $node->append(htmlspecialchars($matches[0][0]));
+            $node->append(mild_htmlspecialchars($matches[0][0]));
         }
     }
 }
@@ -307,7 +318,7 @@ class creole_node {
             $attrs = '';
             if (!empty($this->attrs)) {
                 foreach ($this->attrs as $attr => $value) {
-                    $attrs .= ' ' . $attr . '="' . htmlspecialchars($value) . '"';
+                    $attrs .= ' ' . $attr . '="' . mild_htmlspecialchars($value) . '"';
                 }
             }
             
