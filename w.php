@@ -2,7 +2,7 @@
 
 /*
  * w - A Wiki Software
- * 
+ *
  * Copyright (c) 2009, 2010 Ivan Fomichev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -57,16 +57,14 @@ $id = isset($_GET['id']) ? $_GET['id'] : MAIN_PAGE;
 session_start();
 
 if (isset($_POST['content'])) {
-    if (isset($_POST['captcha_text']) && isset($_SESSION['captcha_text'])
-        && $_POST['captcha_text'] == $_SESSION['captcha_text'])
-    {
+    if (empty($_POST['email'])) {
         $content = $_POST['content'];
         sqlite_exec($dbh, 'INSERT OR REPLACE INTO w (id, content) VALUES' .
                           '(\'' . sqlite_escape_string($id) . '\',\'' .
                                   sqlite_escape_string($content) . '\')');
     }
     else {
-        $error = 'The code you entered was incorrect.';
+        $error = 'You are probably a bot.';
     }
 }
 
@@ -92,7 +90,8 @@ echo('<?xml version="1.0" encoding="UTF-8"?>');
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
 <title><?php echo(htmlspecialchars($id)); ?></title>
 <style type="text/css">
 .error { color: red; }
@@ -112,18 +111,15 @@ echo('<?xml version="1.0" encoding="UTF-8"?>');
 <?php } ?>
 
 
-<form action="<?php echo(format_link($id)); ?>" method="POST">
+<form action="<?php echo(format_link($id)); ?>" method="post">
+<div style="display: none;"><input name="email"/></div>
 <div>
-<textarea name="content" style="width: 100%;" rows="10"><?php
+<textarea name="content" style="width: 100%;" cols="80" rows="10"><?php
     if (isset($_POST['content'])) { echo(htmlspecialchars($_POST['content'])); }
     else if (isset($content)) { echo(htmlspecialchars($content)); }
 ?></textarea>
 </div>
-
-<div>Please enter the code on the image</div>
-<div><img src="captcha.php"/> <input type="text" name="captcha_text"/></div>
-
-<input type="submit"/>
+<div><input type="submit"/></div>
 </form>
 
 <h2>See also</h2>
@@ -132,7 +128,7 @@ echo('<?xml version="1.0" encoding="UTF-8"?>');
 
 $res = sqlite_query($dbh, 'SELECT id FROM w ORDER BY id');
 while (($row = sqlite_fetch_array($res)) !== false) {
-    
+
 ?>
 <div><a href="<?php echo(format_link($row['id'])); ?>"><?php echo(htmlspecialchars($row['id'])); ?></a></div>
 <?php
