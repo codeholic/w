@@ -45,18 +45,18 @@ class creole_rule {
     var $attrs = array();
     var $children = array();
     var $fallback = false;
-   
+
     function creole_rule($params = array()) {
         foreach ($params as $k => $v) {
             eval('$this->' . $k . ' = $v;');
         }
     }
-  
+
     function build($node, $matches, $options = array()) {
         if ($this->capture !== false) {
             $data = $matches[$this->capture][0];
         }
-       
+
         if ($this->tag !== false) {
             $target = new creole_node($this->tag);
             $node->append($target);
@@ -64,37 +64,37 @@ class creole_rule {
         else {
             $target = $node;
         }
-       
+
         if (isset($data)) {
             if ($this->replace_regex) {
                 $data = preg_replace($this->replace_regex, $this->replace_string, $data);
             }
             $this->apply($target, $data, $options);
         }
-       
+
         foreach ($this->attrs as $attr => $value) {
             $target->set_attribute($attr, $value);
         }
     }
-   
+
     function match($data) {
         return preg_match($this->regex, $data, $matches, PREG_OFFSET_CAPTURE)
             ? $matches : false;
     }
-   
+
     function apply($node, $data, $options = array()) {
         $tail = $data;
-       
+
         if (!is_object($this->fallback)) {
             $this->fallback = $this->fallback
                 ? new creole_rule($this->fallback)
                 : new creole_rule_default_fallback();
         }
-       
+
         while (true) {
             $best = false;
             $rule = false;
-           
+
             for ($i = 0; $i < count($this->children); $i++) {
                 if (!isset($matches[$i])) {
                     if (!is_object($this->children[$i])) {
@@ -102,7 +102,7 @@ class creole_rule {
                     }
                     $matches[$i] = $this->children[$i]->match($tail);
                 }
-               
+
                 if ($matches[$i] && (!$best || $matches[$i][0][1] < $best[0][1])) {
                     $best = $matches[$i];
                     $rule = $this->children[$i];
@@ -111,24 +111,24 @@ class creole_rule {
                     }
                 }
             }
-           
+
             $pos = $best ? $best[0][1] : strlen($tail);
             if ($pos > 0) {
                 $this->fallback->apply($node, substr($tail, 0, $pos), $options);
             }
-           
+
             if (!$best) {
                 break;
             }
-           
+
             if (!is_object($rule)) {
                 $rule = new creole_rule($rule);
             }
             $rule->build($node, $best, $options);
-           
+
             $chopped = $best[0][1] + strlen($best[0][0]);
             $tail = substr($tail, $chopped);
-           
+
             for ($i = 0; $i < count($this->children); $i++) {
                 if (isset($matches[$i])) {
                     if ($matches[$i][0][1] >= $chopped) {
@@ -153,7 +153,7 @@ class creole_rule_image extends creole_rule {
     function creole_rule_image($params = array()) {
         parent::creole_rule($params);
     }
-   
+
     function build($node, $matches, $options = array()) {
         $img = new creole_node('img');
         $img->set_attribute('src', $matches[1][0]);
@@ -169,11 +169,11 @@ class creole_rule_named_uri extends creole_rule {
     function creole_rule_named_uri($params = array()) {
         parent::creole_rule($params);
     }
-   
+
     function build($node, $matches, $options = array()) {
         $link = new creole_node('a');
         $link->set_attribute('href', rawurldecode($matches[1][0]));
-       
+
         $this->apply($link, $matches[2][0], $options);
         $node->append($link);
     }
@@ -183,7 +183,7 @@ class creole_rule_unnamed_uri extends creole_rule_named_uri {
     function creole_rule_unnamed_uri($params = array()) {
         parent::creole_rule_named_uri($params);
     }
-   
+
     function build($node, $matches, $options = array()) {
         return parent::build($node, array($matches[0], $matches[1], $matches[1]), $options);
     }
@@ -193,7 +193,7 @@ class creole_rule_named_link extends creole_rule {
     function creole_rule_named_link($params = array()) {
         parent::creole_rule($params);
     }
-   
+
     function format_link($link, $format) {
         if (function_exists($format)) {
             return call_user_func($format, $link);
@@ -203,7 +203,7 @@ class creole_rule_named_link extends creole_rule {
 
     function build($node, $matches, $options = array()) {
         $link = preg_replace('/~(.)/', '$1', $matches[1][0]);
-       
+
         if (isset($options['current_page']) && $options['current_page'] == $link) {
             $self_references = isset($options['self_references']) ? $options['self_references'] : 'allow';
 
@@ -211,13 +211,13 @@ class creole_rule_named_link extends creole_rule {
                 case 'ignore':
                     $this->apply($node, $matches[2][0], $options);
                     return;
-               
+
                 case 'emphasize':
                     $child = new creole_node('strong');
                     break;
             }
         }
-       
+
         if (!isset($child)) {
             $child = new creole_node('a');
             $child->set_attribute(
@@ -225,7 +225,7 @@ class creole_rule_named_link extends creole_rule {
                 isset($options['link_format']) ? $this->format_link($link, $options['link_format']) : $link
             );
         }
-       
+
         $this->apply($child, $matches[2][0], $options);
         $node->append($child);
     }
@@ -235,7 +235,7 @@ class creole_rule_unnamed_link extends creole_rule_named_link {
     function creole_rule_unnamed_link($params = array()) {
         parent::creole_rule_named_link($params);
     }
-   
+
     function build($node, $matches, $options = array()) {
         return parent::build($node, array($matches[0], $matches[1], $matches[1]), $options);
     }
@@ -250,16 +250,16 @@ class creole_rule_named_interwiki_link extends creole_rule_named_link {
         if (isset($options['interwiki'])) {
             preg_match('/(.*?):(.*)/', $matches[1][0], $m);
         }
-       
+
         if (!isset($m[1]) || !isset($options['interwiki'][$m[1]])) {
             return parent::build($node, $matches, $options);
         }
-       
+
         $format = $options['interwiki'][$m[1]];
 
         $link = new creole_node('a');
         $link->set_attribute('href', $this->format_link(preg_replace('/~(.)/', '$1', $m[2]), $format));
-       
+
         $this->apply($link, $matches[2][0], $options);
         $node->append($link);
     }
@@ -279,7 +279,7 @@ class creole_rule_extension extends creole_rule {
     function creole_rule_extension($params = array()) {
         parent::creole_rule($params);
     }
-   
+
     function build($node, $matches, $options = array()) {
         if (isset($options['extension']) && is_callable($options['extension'])) {
             call_user_func($options['extension'], $node, $matches[1][0]);
@@ -294,38 +294,38 @@ class creole_node {
     var $tag;
     var $attrs;
     var $content = array();
-   
+
     function creole_node($tag = false) {
         $this->tag = $tag;
     }
-   
+
     function append($node) {
         $this->content[] = $node;
     }
-   
+
     function set_attribute($attr, $value) {
         $this->attrs[$attr] = $value;
     }
-   
+
     function as_string() {
         $result = '';
         foreach ($this->content as $item) {
             $result .= is_object($item) ? $item->as_string() : mild_htmlspecialchars($item);
         }
-       
+
         if (!empty($this->tag)) {
             $tag = $this->tag;
-           
+
             $attrs = '';
             if (!empty($this->attrs)) {
                 foreach ($this->attrs as $attr => $value) {
                     $attrs .= ' ' . $attr . '="' . mild_htmlspecialchars($value) . '"';
                 }
             }
-           
+
             $result = empty($result) ? "<$tag$attrs/>" : "<$tag$attrs>$result</$tag>";
         }
-       
+
         return $result;
     }
 }
@@ -333,10 +333,10 @@ class creole_node {
 class creole {
     var $grammar;
     var $options;
-   
+
     function creole($options = array()) {
         $this->options = $options;
-       
+
         $rx['ext'] = '<<<([^>]*(?:>>?(?!>)[^>]*)*)>>>';
         $rx['link'] = '[^\]|~\n]*(?:(?:\](?!\])|~.)[^\]|~\n]*)*';
         $rx['link_text'] = '[^\]~\n]*(?:(?:\](?!\])|~.)[^\]~\n]*)*';
@@ -347,18 +347,18 @@ class creole {
         $rx['interwiki_link'] = $rx['interwiki_prefix'] . $rx['link'];
         $rx['image'] = '\{\{((?!\{)[^|}\n]*(?:}(?!})[^|}\n]*)*)' .
             '(?:\|([^}~\n]*((}(?!})|~.)[^}~\n]*)*))?}}';
-       
+
         $g = array(
             'hr' => array(
                 'tag' => 'hr',
                 'regex' => '/(^|\n)\s*----\s*(\n|$)/'
             ),
-           
+
             'br' => array(
                 'tag' => 'br',
                 'regex' => '/\\\\\\\\/'
             ),
-           
+
             'pre' => array(
                 'tag' => 'pre',
                 'regex' => '/(^|\n)\{\{\{[ \t]*\n((.*\n)*?)}}}[ \t]*(\n|$)/',
@@ -373,7 +373,7 @@ class creole {
                 'replace_regex' => '/}}}$/',
                 'replace_string' => ''
             ),
-           
+
             'ul' => array(
                 'tag' => 'ul',
                 'regex' => '/(^|\n)([ \t]*\*[^*#].*(\n|$)([ \t]*[^\s*#].*(\n|$))*([ \t]*[*#]{2}.*(\n|$))*)+/',
@@ -414,7 +414,7 @@ class creole {
                        '|' . $rx['image'] . '|[\[{])[^|~]*)*)/',
                 'capture' => 1
             ),
-           
+
             'single_line' => array(
                 'regex' => '/.+/',
                 'capture' => 0
@@ -445,7 +445,7 @@ class creole {
             'img' => new creole_rule_image(array(
                 'regex' => '/' . $rx['image'] . '/',
             )),
-           
+
             'escaped_sequence' => array(
                 'regex' => '/~(' . $rx['raw_uri'] . '|.)/',
                 'capture' => 1,
@@ -458,7 +458,7 @@ class creole {
                 'tag' => 'span',
                 'attrs' => array( 'class' => 'escaped' )
             ),
-           
+
             'named_uri' => new creole_rule_named_uri(array(
                 'regex' => '/\[\[(' . $rx['uri'] . ')\|(' . $rx['link_text'] . ')\]\]/'
             )),
@@ -481,12 +481,12 @@ class creole {
             'raw_uri' => new creole_rule_unnamed_uri(array(
                 'regex' => '/(' . $rx['raw_uri'] . ')/',
             )),
-           
+
             'extension' => new creole_rule_extension(array(
                 'regex' => '/' . $rx['ext'] . '/',
             ))
         );
-       
+
         for ($i = 1; $i <= 6; $i++) {
             $g['h' . $i] = array(
                 'tag' => 'h' . $i,
@@ -495,20 +495,20 @@ class creole {
                 'capture' => 2
             );
         }
-       
+
         $g['named_uri']->children = $g['unnamed_uri']->children = $g['raw_uri']->children =
                 $g['named_link']->children = $g['unnamed_link']->children =
                 $g['named_interwiki_link']->children = $g['unnamed_interwiki_link']->children =
             array(&$g['escaped_symbol'], &$g['img']);
-       
+
         $g['ul']['children'] = $g['ol']['children'] = array(&$g['li']);
         $g['li']['children'] = array(&$g['ul'], &$g['ol']);
         $g['li']['fallback'] = array('children' => array(&$g['text']));
-       
+
         $g['table']['children'] = array(&$g['tr']);
         $g['tr']['children'] = array(&$g['th'], &$g['td']);
         $g['th']['children'] = $g['td']['children'] = array(&$g['single_line']);
-       
+
         $g['h1']['children'] = $g['h2']['children'] = $g['h3']['children'] =
                 $g['h4']['children'] = $g['h5']['children'] = $g['h6']['children'] =
                 $g['single_line']['children'] = $g['text']['children'] = $g['p']['children'] =
@@ -527,10 +527,10 @@ class creole {
             ),
             'fallback' => array('children' => array(&$g['p']))
         ));
-       
+
         $this->grammar = $g;
     }
-   
+
     function parse($data, $options = array()) {
         $node = new creole_node();
         $data = preg_replace('/\r\n?/', "\n", $data);
