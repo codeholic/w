@@ -580,7 +580,7 @@ $tests = array(
     ),
 );
 
-plan(count($array));
+plan(count($tests));
 
 function palindrome_callback($link) {
     return 'http://www.example.com/wiki/' . strrev($link);

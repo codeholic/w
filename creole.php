@@ -157,7 +157,8 @@ class creole_rule_image extends creole_rule {
     function build($node, $matches, $options = array()) {
         $img = new creole_node('img');
         $img->set_attribute('src', $matches[1][0]);
-        $img->set_attribute('alt', preg_replace('/~(.)/', '$1', $matches[2][0]));
+        $alt = isset($matches[2]) ? $matches[2][0] : '';
+        $img->set_attribute('alt', preg_replace('/~(.)/', '$1', $alt));
 
         $node->append($img);
     }
