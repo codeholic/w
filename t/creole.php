@@ -596,7 +596,7 @@ function html_handler($node, $arg) {
 
 function extension_callback($node, $data) {
     list($moniker, $arg) = explode(' ', $data, 2);
-    call_user_func($moniker . '_handler', $node, $arg); 
+    call_user_func($moniker . '_handler', $node, $arg);
 }
 
 foreach ($tests as $test) {
