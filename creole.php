@@ -143,9 +143,9 @@ class creole_rule {
     }
 }
 
-class creole_rule_default_fallback extends creole_rule {
+class creole_rule_default_fallback {
     function apply($node, $data, $options = array()) {
-        $node->append(mild_htmlspecialchars($data));
+        $node->append($data);
     }
 }
 
@@ -285,7 +285,7 @@ class creole_rule_extension extends creole_rule {
             call_user_func($options['extension'], $node, $matches[1][0]);
         }
         else {
-            $node->append(mild_htmlspecialchars($matches[0][0]));
+            $node->append($matches[0][0]);
         }
     }
 }
@@ -310,7 +310,7 @@ class creole_node {
     function as_string() {
         $result = '';
         foreach ($this->content as $item) {
-            $result .= is_object($item) ? $item->as_string() : $item;
+            $result .= is_object($item) ? $item->as_string() : mild_htmlspecialchars($item);
         }
        
         if (!empty($this->tag)) {

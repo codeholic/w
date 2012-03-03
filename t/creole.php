@@ -590,8 +590,20 @@ function php_handler($node, $arg) { // never use it in production!
     eval($arg);
 }
 
+class creole_html {
+    var $html;
+
+    function creole_html($html) {
+        $this->html = $html;
+    }
+
+    function as_string() {
+        return $this->html;
+    }
+}
+
 function html_handler($node, $arg) {
-    $node->append($arg);
+    $node->append(new creole_html($arg));
 }
 
 function extension_callback($node, $data) {
