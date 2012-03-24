@@ -499,7 +499,7 @@ class creole {
         $g['named_uri']->children = $g['unnamed_uri']->children = $g['raw_uri']->children =
                 $g['named_link']->children = $g['unnamed_link']->children =
                 $g['named_interwiki_link']->children = $g['unnamed_interwiki_link']->children =
-            array(&$g['escaped_symbol'], &$g['img']);
+            array(&$g['escaped_symbol'], &$g['img'], &$g['br']);
 
         $g['ul']['children'] = $g['ol']['children'] = array(&$g['li']);
         $g['li']['children'] = array(&$g['ul'], &$g['ol']);

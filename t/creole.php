@@ -578,6 +578,11 @@ $tests = array(
         'input'   => "{{image.png|This is hellipsis&hellip;}}",
         'output'  => '<p><img src="image.png" alt="This is hellipsis&hellip;"/></p>',
     ),
+    array(
+        'name'    => "Linebreak in link",
+        'input'   => "[[Link|Before\\\\After]]",
+        'output'  => "<p><a href=\"/wiki/Link\">Before<br/>After</a></p>"
+    ),
 );
 
 plan(count($tests));
